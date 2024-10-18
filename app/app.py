@@ -2,7 +2,8 @@ import requests, os
 from flask import Flask
 
 url = "https://api.github.com/users/"
-people = 'people_using.txt'
+people = 'people.txt'
+user_not_found_message = "User not found 😢"
 
 app = Flask(__name__)
 
@@ -10,22 +11,34 @@ app = Flask(__name__)
 
 @app.route('/')
 def info():
-    return "Add your Github username to the URL to get the list of people you are following but are not following you back 😉\n\n Or Add /followers or /following to the username to get yours followers or following respectively 🌚"
+    return "Add your Github username to the URL ( /MawulB ) to get the list of people you are following but are not following you back 😉\n\n Or Add /followers or /following to the username to get yours followers or following respectively 🌚"
 
 @app.route('/<name>')
 def home(name):
     update_user_count(name)
-    return get_following_not_followers(name)
+    try:
+        return get_following_not_followers(name)
+    except Exception as e:
+        print(e)
+        return user_not_found_message
 
 @app.route('/<name>/followers')
 def followers(name):
     update_user_count(name)
-    return get_followers(name)
+    try:
+        return get_followers(name)
+    except Exception as e:
+        print(e)
+        return user_not_found_message
 
 @app.route('/<name>/following')
 def following(name):
     update_user_count(name)
-    return get_following(name)
+    try:
+        return get_following(name)
+    except Exception as e:
+        print(e)
+        return user_not_found_message
 
 
 # Helper functions
@@ -33,8 +46,6 @@ def following(name):
 def get_following_not_followers(name):
     following = get_following(name)
     followers = get_followers(name)
-    print(following)
-    print(followers)
     diff = set(following) - set(followers)
     return list(diff)
 
